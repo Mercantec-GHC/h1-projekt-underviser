@@ -1,7 +1,41 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject DbService DBService
 
-<PageTitle>Home</PageTitle>
+<p>@(isConnected ? "Connected to the database" : "Not connected to the database")</p>
 
-<h1>Hello, world!</h1>
+<button @onclick="SetupUserTable">Setup User Table</button>
+<p>@result</p>
 
-Welcome to your new app.
+<button @onclick="GetUsers">Get Users</button>
+<ul>
+    @foreach (var user in users)
+    {
+        <li>@user.Name</li>
+        <li>@user.Email</li>
+        <li>@(new string('*', user.Password.Length))</li>
+    }
+</ul>
+
+
+@code {
+    bool isConnected = false;
+    protected override async Task OnInitializedAsync()
+    {
+        isConnected = await DBService.TestConnectionAsync();
+    }
+
+    string result = string.Empty;
+
+    private async Task SetupUserTable()
+    {
+        result = await DBService.SetupUserTable();
+    }
+
+    List<Users> users = new List<Users>();
+
+    private async Task GetUsers()
+    {
+        users = await DBService.GetAllUsers();
+    }
+}
