@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using Microsoft.Extensions.Configuration;
 using Blazor.Models;
+using BlazorMarkedsplads.Models;
 
 namespace BlazorMarkedsplads.Services
 {
@@ -14,7 +15,7 @@ namespace BlazorMarkedsplads.Services
         }
     
 
-    public async Task<bool> TestConnectionAsync()
+        public async Task<bool> TestConnectionAsync()
         {
             try
             {
@@ -28,53 +29,57 @@ namespace BlazorMarkedsplads.Services
             }
         }
 
-        // Setup User Table
-        public async Task<string> SetupUserTable()
+        public async Task<List<Shop>> GetShopItemsAsync()
         {
-            using (var connection = new NpgsqlConnection(_connectionString))
+            var items = new List<Shop>();
+
+            const string sql = @"
+                SELECT 
+                    shop.shop_item_id,
+                    shop.price,
+                    shop.quantity,
+                    shop.available,
+                    items.item_name,
+                    items.item_type,
+                    items.rarity,
+                    items.image_url,
+                    items.description
+                FROM shop
+                JOIN items ON shop.item_id = items.item_id
+                WHERE shop.available = TRUE
+                ORDER BY shop.shop_item_id;";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var cmd = new NpgsqlCommand(sql, connection);
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
             {
-                await connection.OpenAsync();
-                using (
-                    var command = new NpgsqlCommand(
-                      @"CREATE TABLE IF NOT EXISTS users (
-	                  id SERIAL PRIMARY KEY, 
-                      name VARCHAR(255), 
-                      email VARCHAR(255), 
-                      password VARCHAR(255))",
-                      connection)
-                      )
+                var item = new Shop
                 {
-                    await command.ExecuteNonQueryAsync();
-                }
+                    ShopItemId = reader.GetInt32(reader.GetOrdinal("shop_item_id")),
+                    Price = reader.GetInt32(reader.GetOrdinal("price")),
+                    Quantity = reader.GetInt32(reader.GetOrdinal("quantity")),
+                    Available = reader.GetBoolean(reader.GetOrdinal("available")),
+                    ItemName = reader.GetString(reader.GetOrdinal("item_name")),
+                    ItemType = reader.GetString(reader.GetOrdinal("item_type")),
+                    Rarity = reader.GetString(reader.GetOrdinal("rarity")),
+                    ImageUrl = reader.IsDBNull(reader.GetOrdinal("image_url"))
+                                ? null
+                                : reader.GetString(reader.GetOrdinal("image_url")),
+                    Description = reader.IsDBNull(reader.GetOrdinal("description"))
+                                ? null
+                                : reader.GetString(reader.GetOrdinal("description"))
+                };
+
+                items.Add(item);
             }
-            return "User table created successfully";
+
+            return items;
         }
 
-        // Get All Users
-        public async Task<List<Users>> GetAllUsers()
-        {
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                using (var command = new NpgsqlCommand("SELECT * FROM users", connection))
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    var users = new List<Users>();
-                    while (await reader.ReadAsync())
-                    {
-                        users.Add(
-                          new Users
-                          {
-                              Id = reader.GetInt32(reader.GetOrdinal("id")),
-                              Name = reader.GetString(reader.GetOrdinal("name")),
-                              Email = reader.GetString(reader.GetOrdinal("email")),
-                              Password = reader.GetString(reader.GetOrdinal("password"))
-                          }
-                      );
-                    }
-                    return users;
-                }
-            }
-        }
-    } 
-}
+    }
+} 
+

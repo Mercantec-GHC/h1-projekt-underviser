@@ -1,0 +1,31 @@
+﻿@inject DbService DBService
+
+<h3>Shop Items</h3>
+
+<ul>
+    @foreach (var item in items) 
+    {
+        <li><img src="@item.ImageUrl" /></li>
+        <li>@item.ItemName</li>
+        <li>@item.ItemType</li>
+        <li>@item.Available</li>
+        <li>@item.Rarity</li>
+        <li>@item.Description</li>
+        <li>@item.Quantity</li>
+        <li>@item.Price</li>
+    }
+</ul>
+
+@code {
+    List<Shop> items = new List<Shop>();
+
+    private async Task GetUsers()
+    {
+        items = await DBService.GetShopItemsAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsers();
+    }
+}
