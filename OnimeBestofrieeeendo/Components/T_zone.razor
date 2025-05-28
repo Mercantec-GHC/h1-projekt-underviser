@@ -1,0 +1,50 @@
+﻿@rendermode InteractiveServer
+@inject DbService DbService
+@inject NavigationManager Navigation
+@page "/test"
+<h3>Welcome to Trading Zone!!!</h3>
+
+<div class="container-full">
+    <div class="products-wrapper">
+        <!-- добавлено -->
+        <div class="products-grid">
+            @foreach (var product in shopProducts)
+            {
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="@product.ImageUrl" alt="@product.ItemName" />
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">@product.ItemName</h3>
+                        <h2 class="product-title">@product.Rarity</h2>
+                        <span class="product-price">@product.Price DKK</span>
+                        <div class="product-actions">
+                            <button class="btn-add-cart">Add to Cart</button>
+                            <button class="btn-read-more" @onclick="() => GoToItem(product.ShopItemId)">Read More</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    List<TradeItems> shopProducts = new List<TradeItems>();
+
+    private async Task GetProducts()
+    {
+
+        shopProducts = await DbService.GetShopItemsAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProducts();
+    }
+    void GoToItem(int id)
+    {
+        Navigation.NavigateTo($"/details?Id={id}");
+    }
+
+}

@@ -1,4 +1,5 @@
 using OnimeBestofrieeeendo.Components;
+using OnimeBestofrieeeendo.Services;
 
 namespace OnimeBestofrieeeendo;
 
@@ -12,6 +13,9 @@ public class Program
         // Add services to the container.
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
+
+        builder.Services.AddScoped<DbService>();
+
 
         var app = builder.Build();
 

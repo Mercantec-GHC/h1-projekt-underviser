@@ -1,0 +1,36 @@
+﻿@rendermode InteractiveServer
+@inject DbService DbService
+@inject NavigationManager Navigation
+@page "/details"
+<h3>Details</h3>
+
+@if (item == null)
+{
+    <p>Loading or item not found...</p>
+}
+else
+{
+    <div class="item-details">
+        <img src="@item.ImageUrl" alt="@item.ItemName" />
+        <h2>@item.ItemName</h2>
+        <p><strong>Type:</strong> @item.ItemType</p>
+        <p><strong>Rarity:</strong> @item.Rarity</p>
+        <p><strong>Price:</strong> @item.Price DKK</p>
+        <p><strong>Quantity:</strong> @item.Quantity</p>
+        <p>@item.Description</p>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int Id { get; set; } = 0;
+
+    private TradeItems? item;
+
+    protected override async Task OnInitializedAsync()
+    {
+      item = await DbService.GetItemDetailsAsync(Id);
+    }
+}
