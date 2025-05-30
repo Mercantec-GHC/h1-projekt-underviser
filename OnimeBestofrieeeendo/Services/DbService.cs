@@ -1,5 +1,7 @@
 ﻿using Npgsql;
 using OnimeBestofrieeeendo.Models;
+using Onime.Models;
+using System.Data.SqlTypes;
 
 namespace OnimeBestofrieeeendo.Services
 
@@ -109,6 +111,47 @@ namespace OnimeBestofrieeeendo.Services
             return null;
         }
 
+        public async Task<bool> DeleteShopItemAsync(int shopItemId)
+        {
+            const string sql = "DELETE FROM shop WHERE shop_item_id = @shopItemId";
 
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new NpgsqlCommand(sql, connection);
+            command.Parameters.AddWithValue("shopItemId", shopItemId);
+
+            int rowsAffected = await command.ExecuteNonQueryAsync();
+
+            return rowsAffected > 0;
+        }
+
+        public async Task<UserProfile> GetUserProfileAsync() 
+        {
+            const string sql = @"
+            SELECT
+                users.id,
+                users.username,
+                users.balance
+            FROM users WHERE users.id = 1";
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var cmd = new NpgsqlCommand( sql, connection);
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                var user = new UserProfile
+                {
+                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                    Username = reader.GetString(reader.GetOrdinal("username")),
+                    Balance = reader.GetInt32(reader.GetOrdinal("balance"))
+                };
+                return user;
+            }
+            return null;
+        }
     }
 }

@@ -2,7 +2,7 @@
 @inject DbService DbService
 @inject NavigationManager Navigation
 @page "/details"
-<h3>Details</h3>
+@using Onime.Models
 
 @if (item == null)
 {
@@ -18,6 +18,7 @@ else
         <p><strong>Price:</strong> @item.Price DKK</p>
         <p><strong>Quantity:</strong> @item.Quantity</p>
         <p>@item.Description</p>
+        <button id="buy-btn" @onclick="() => BuyAsync(Id)">Buy</button>
     </div>
 }
 
@@ -28,9 +29,27 @@ else
     public int Id { get; set; } = 0;
 
     private TradeItems? item;
+    private UserProfile user;
 
     protected override async Task OnInitializedAsync()
     {
-      item = await DbService.GetItemDetailsAsync(Id);
+        item = await DbService.GetItemDetailsAsync(Id);
+        user = await DbService.GetUserProfileAsync();
+    }
+
+    private async Task BuyAsync(int id)
+    {
+        if (user.Balance >= item.Price)
+        {
+            await DbService.DeleteShopItemAsync(id);
+            // TODO: create a method to push the balance changes to db
+            user.Balance -= item.Price;
+            GoToShop();
+        }
+    }
+
+    private void GoToShop()
+    {
+        Navigation.NavigateTo("/test");
     }
 }
