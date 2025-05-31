@@ -42,8 +42,7 @@ else
         if (user.Balance >= item.Price)
         {
             await DbService.DeleteShopItemAsync(id);
-            // TODO: create a method to push the balance changes to db
-            user.Balance -= item.Price;
+            await DbService.UpdateBalance(user, item.Price);
             GoToShop();
         }
     }

@@ -111,7 +111,7 @@ namespace OnimeBestofrieeeendo.Services
             return null;
         }
 
-        public async Task<bool> DeleteShopItemAsync(int shopItemId)
+        public async Task DeleteShopItemAsync(int shopItemId)
         {
             const string sql = "DELETE FROM shop WHERE shop_item_id = @shopItemId";
 
@@ -120,10 +120,6 @@ namespace OnimeBestofrieeeendo.Services
 
             using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("shopItemId", shopItemId);
-
-            int rowsAffected = await command.ExecuteNonQueryAsync();
-
-            return rowsAffected > 0;
         }
 
         public async Task<UserProfile> GetUserProfileAsync() 
@@ -152,6 +148,40 @@ namespace OnimeBestofrieeeendo.Services
                 return user;
             }
             return null;
+        }
+
+        public async Task<bool> UpdateBalance(UserProfile user, int price)
+        {
+            await using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            await using var transaction = await connection.BeginTransactionAsync(); // Begin transactionas
+
+            try
+            {
+                // Get current balance
+                var getBalanceCmd = new NpgsqlCommand("SELECT balance FROM users WHERE id = 1", connection, transaction);
+
+                var result = await getBalanceCmd.ExecuteScalarAsync();
+                var currentBalance = Convert.ToInt32(result);
+                var newBalance = currentBalance - price;
+
+                // Update balance
+                var updateCmd = new NpgsqlCommand("UPDATE users SET balance = @balance WHERE id = @id", connection, transaction);
+                updateCmd.Parameters.AddWithValue("@balance", newBalance);
+                updateCmd.Parameters.AddWithValue("@id", user.Id);
+
+                await updateCmd.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine("Ошибка: " + ex.Message);
+                return false;
+            }
         }
     }
 }
