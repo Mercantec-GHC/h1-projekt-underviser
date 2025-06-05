@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="my-layout">
+    <nav id="navbar">
+        <ul id="nav-list">
+            <li class="nav-option" @onclick="() => GoBack()">
+                Go back
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        @Body
+    </main>
+
+</div>
+
+@code {
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

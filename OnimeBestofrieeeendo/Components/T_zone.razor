@@ -1,32 +1,42 @@
 ﻿@rendermode InteractiveServer
 @inject DbService DbService
 @inject NavigationManager Navigation
+@layout MyLayout
 @page "/test"
-<h3>Welcome to Trading Zone!!!</h3>
 
-<div class="container-full">
-    <div class="products-wrapper">
-        <div class="products-grid">
-            @foreach (var product in shopProducts)
-            {
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="@product.ImageUrl" alt="@product.ItemName" />
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">@product.ItemName</h3>
-                        <h2 class="product-title">@product.Rarity</h2>
-                        <span class="product-price">@product.Price DKK</span>
-                        <div class="product-actions">
-                            <button class="btn-add-cart">Add to Cart</button>
-                            <button class="btn-read-more" @onclick="() => GoToItem(product.ShopItemId)">Read More</button>
-                        </div>
+@* <nav id="navbar"> *@
+@*     <ul id="nav-list"> *@
+@*         <li class="nav-option" @onclick="() => GoBack()"> Go back *@
+@*         </li> *@
+@*     </ul> *@
+@* </nav> *@
+
+<main>
+    <div id="welcome-msg">
+        <h3>Welcome to the Trading Zone!!!</h3>
+        <button id="create-btn" @onclick="() => CreateItem()">Sell your own item</button>
+    </div>
+
+    <section id="prods-section">
+        @foreach (var prod in shopProducts)
+        {
+            <div class="prod-card">
+                <div class="img-containter">
+                    <img src="@prod.ImageUrl" alt="@prod.ItemName" />
+                </div>
+                <div class="prod-info">
+                    <h3 class="prod-title">@prod.ItemName</h3>
+                    <span class="prod-price">@prod.Price DKK</span>
+                    <span class="prod-price">@prod.Rarity</span>
+                    <div class="prod-actions">
+                        <button>Add to Cart</button>
+                        <button @onclick="() => GoToItem(prod.ShopItemId)">Read More</button>
                     </div>
                 </div>
-            }
-        </div>
-    </div>
-</div>
+            </div>
+        }
+    </section>
+</main>
 
 @code {
     List<TradeItems> shopProducts = new List<TradeItems>();
@@ -46,4 +56,11 @@
         Navigation.NavigateTo($"/details?Id={id}");
     }
 
+    private void CreateItem() {
+        Navigation.NavigateTo("/create");
+    }
+
+    // private void GoBack() {
+    //     Navigation.NavigateTo("/");
+    // }
 }

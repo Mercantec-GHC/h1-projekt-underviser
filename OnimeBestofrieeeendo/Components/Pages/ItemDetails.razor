@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @page "/details"
 @using Onime.Models
+@layout MyLayout
 
 @if (item == null)
 {
@@ -17,7 +18,7 @@ else
         <p><strong>Rarity:</strong> @item.Rarity</p>
         <p><strong>Price:</strong> @item.Price DKK</p>
         <p><strong>Quantity:</strong> @item.Quantity</p>
-        <p>@item.Description</p>
+        <p><strong>Description:</strong> @item.Description</p>
         <button id="buy-btn" @onclick="() => BuyAsync(Id)">Buy</button>
     </div>
 }
@@ -49,6 +50,6 @@ else
 
     private void GoToShop()
     {
-        Navigation.NavigateTo("/test");
+        Navigation.NavigateTo("/");
     }
 }

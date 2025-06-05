@@ -76,7 +76,7 @@ namespace OnimeBestofrieeeendo.Services
             items.description
         FROM shop
         JOIN items ON shop.item_id = items.item_id
-        WHERE shop.item_id = @id;";
+        WHERE shop.shop_item_id = @id;";
 
             using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
@@ -115,12 +115,15 @@ namespace OnimeBestofrieeeendo.Services
         {
             const string sql = "DELETE FROM shop WHERE shop_item_id = @shopItemId";
 
-            using var connection = new NpgsqlConnection(_connectionString);
+            await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            using var command = new NpgsqlCommand(sql, connection);
+            await using var command = new NpgsqlCommand(sql, connection);
             command.Parameters.AddWithValue("shopItemId", shopItemId);
+
+            await command.ExecuteNonQueryAsync();
         }
+
 
         public async Task<UserProfile> GetUserProfileAsync() 
         {
@@ -183,5 +186,53 @@ namespace OnimeBestofrieeeendo.Services
                 return false;
             }
         }
+
+        public async Task CreateItem(TradeItems item)
+        {
+            const string sqlItems = @"
+        INSERT INTO items (item_name, item_type, rarity, image_url, description)
+        VALUES (@name, @type, @rarity, @imageUrl, @description)
+        RETURNING item_id;
+    ";
+
+            const string sqlShop = @"
+        INSERT INTO shop (item_id, price)
+        VALUES (@itemId, @price);
+    ";
+
+            await using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            await using var transaction = await connection.BeginTransactionAsync();
+
+            try
+            {
+                // insert into items
+                await using var cmdItems = new NpgsqlCommand(sqlItems, connection, transaction);
+                cmdItems.Parameters.AddWithValue("@name", item.ItemName);
+                cmdItems.Parameters.AddWithValue("@type", item.ItemType);
+                cmdItems.Parameters.AddWithValue("@rarity", (object?)item.Rarity ?? DBNull.Value);
+                cmdItems.Parameters.AddWithValue("@imageUrl", (object?)item.ImageUrl ?? DBNull.Value);
+                cmdItems.Parameters.AddWithValue("@description", (object?)item.Description ?? DBNull.Value);
+
+                var itemId = (int)(await cmdItems.ExecuteScalarAsync())!;
+
+                // insert into shop
+                await using var cmdShop = new NpgsqlCommand(sqlShop, connection, transaction);
+                cmdShop.Parameters.AddWithValue("@itemId", itemId);
+                cmdShop.Parameters.AddWithValue("@price", item.Price);
+
+                await cmdShop.ExecuteNonQueryAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+
     }
 }
