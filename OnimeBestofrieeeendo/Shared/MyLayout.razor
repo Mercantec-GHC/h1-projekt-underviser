@@ -1,18 +1,24 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.JSInterop
+@using Services
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject DbService DbService
 
 <div class="my-layout">
+    @* TODO: Add current balance to the nav menu (on the right side preferrably) *@
     <nav id="navbar">
         <ul id="nav-list">
             <li class="nav-option">
-                <a href="/" @onclick="() => Navigation.NavigateTo("/")">Home Page</a>
-            </li>
-            <li class="nav-option">
-                <a href="/test" @onclick="GoBack">Go back</a>
+                <a href="/" @onclick="() => Navigation.NavigateTo(" /")">Home Page</a>
             </li>
 
+            @if (currentPath != "/test")
+            {
+                <li class="nav-option">
+                    <a href="/test" @onclick="GoBack">Go back</a>
+                </li>
+            }
         </ul>
     </nav>
     <div class="kanji-container">
@@ -34,6 +40,13 @@
 </div>
 
 @code {
+    @inject NavigationManager Navigation
+
+    @code {
+        private string currentPath => "/" + Navigation.ToBaseRelativePath(Navigation.Uri).ToLower();
+    }
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

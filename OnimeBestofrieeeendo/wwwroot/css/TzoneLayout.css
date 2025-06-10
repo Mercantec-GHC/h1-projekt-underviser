@@ -322,6 +322,25 @@ main {
                 color: #fff;
             }
 
+#welcome-msg-tzone {
+    background: linear-gradient(90deg, #ff6a00, #ee0979, #ff6a00);
+    background-size: 200% auto;
+    background-clip: text;
+    color: transparent;
+    animation: gradientShift 3s linear infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+
 @media (max-width: 900px) {
     #prods-section {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
