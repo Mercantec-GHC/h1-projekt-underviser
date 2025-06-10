@@ -1,14 +1,31 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 
 <div class="my-layout">
     <nav id="navbar">
         <ul id="nav-list">
-            <li class="nav-option" @onclick="() => GoBack()">
-                Go back
+            <li class="nav-option">
+                <a href="/" @onclick="() => Navigation.NavigateTo("/")">Home Page</a>
             </li>
+            <li class="nav-option">
+                <a href="/test" @onclick="GoBack">Go back</a>
+            </li>
+
         </ul>
     </nav>
+    <div class="kanji-container">
+        <span class="kanji-bg k1">友達</span>
+        <span class="kanji-bg k2">交換</span>
+        <span class="kanji-bg k3">夢</span>
+        <span class="kanji-bg k4">心</span>
+        <span class="kanji-bg k5">力</span>
+        <span class="kanji-bg k6">光</span>
+        <span class="kanji-bg k7">風</span>
+        <span class="kanji-bg k8">花</span>
+        <span class="kanji-bg k9">月</span>
+    </div>
 
     <main>
         @Body
@@ -17,8 +34,17 @@
 </div>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("document.body.classList.add", "ready");
+        }
+    }
+
     private void GoBack()
     {
-        Navigation.NavigateTo("/");
+
+        Navigation.NavigateTo("/test");
     }
 }

@@ -12,7 +12,7 @@
 else
 {
     <div class="item-details">
-        <img src="@item.ImageUrl" alt="@item.ItemName" />
+        <img src="@item.ImageUrl" alt="@item.ItemName" @onload="StateHasChanged" />
         <h2>@item.ItemName</h2>
         <p><strong>Type:</strong> @item.ItemType</p>
         <p><strong>Rarity:</strong> @item.Rarity</p>
@@ -50,6 +50,7 @@ else
 
     private void GoToShop()
     {
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/test");
     }
 }
+
