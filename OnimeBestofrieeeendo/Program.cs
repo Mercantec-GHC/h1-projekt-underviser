@@ -17,6 +17,8 @@ public class Program
         builder.Services.AddScoped<ContactService>();
         builder.Services.AddScoped<UserProfileService>();
         builder.Services.AddScoped<DbService>();
+        builder.Services.AddScoped<ShopService>();
+        builder.Services.AddScoped<ShopBusinessService>();
 
         var app = builder.Build();
 

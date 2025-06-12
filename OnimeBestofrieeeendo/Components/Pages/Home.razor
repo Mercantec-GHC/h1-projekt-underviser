@@ -1,11 +1,12 @@
 @page "/"
-@using Npgsql
 @inject IJSRuntime JsRuntime
 @inject IConfiguration Configuration
 @rendermode InteractiveServer
 @using System.ComponentModel.DataAnnotations;
 @inject ContactService ContactService
 @inject OnimeBestofrieeeendo.Components.Services.UserProfileService UserProfileService
+@inject OnimeBestofrieeeendo.Components.Services.ShopService ShopService
+@inject OnimeBestofrieeeendo.Components.Services.ShopBusinessService ShopBusinessService
 
 
 <!-- ==================== ГЛАВНАЯ СЕКЦИЯ ==================== -->
@@ -379,6 +380,7 @@
         public string Message { get; set; } = "";
     }
 
+
     private async Task BuyProduct(ShopProductView product)
     {
         if (_currentUserProfile == null)
@@ -390,41 +392,20 @@
             return;
         }
 
-        try
+        var success = await ShopService.BuyProductAsync(_currentUserProfile.Id, product);
+
+        if (success)
         {
-            var connString = Configuration.GetConnectionString("DefaultConnection");
-            await using var conn = new NpgsqlConnection(connString);
-            await conn.OpenAsync();
-            
-            // Обновляем баланс пользователя
-            var userCmd = new NpgsqlCommand("UPDATE users SET balance = balance - @price WHERE id = @userId", conn);
-            userCmd.Parameters.AddWithValue("@price", product.Price);
-            userCmd.Parameters.AddWithValue("@userId", _currentUserProfile.Id);
-            var userUpdateResult = await userCmd.ExecuteNonQueryAsync();
-
-            // Обновляем количество товара
-            var productCmd = new NpgsqlCommand("UPDATE shop_items SET quantity = quantity - 1 WHERE shop_item_id = @shopItemId", conn);
-            productCmd.Parameters.AddWithValue("@shopItemId", product.ShopItemId);
-            var productUpdateResult = await productCmd.ExecuteNonQueryAsync();
-
-            if (userUpdateResult > 0 && productUpdateResult > 0)
-            {
-                await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Поздравляем 🎉", $"Ты купил: {product.Name}!");
-                _shopProducts = await LoadProductAsync();
-                _currentUserProfile.Balance -= product.Price;
-                StateHasChanged();
-            }
-            else
-            {
-                await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Ошибка 😵", "Не удалось обновить данные.");
-            }
+            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Поздравляем 🎉", $"Ты купил: {product.Name}!");
+            _shopProducts = await ShopService.LoadProductsAsync();
+            _currentUserProfile.Balance -= product.Price;
+            StateHasChanged();
         }
-        catch (Exception)
+        else
         {
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Ошибка 😵", "Покупка не удалась. Попробуй ещё раз.");
+            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Ошибка 😵", "Не удалось обновить данные.");
         }
     }
-    
     
     // ==================== НАШИ ШМОТКИ И ДАННЫЕ ====================
     // Список всех шмоток в магазе
@@ -445,9 +426,7 @@
     {
         try
         {
-            // Тащим профили из базы через сервис
             _profiles = await UserProfileService.LoadProfilesAsync();
-            // Ищем наш профиль по айди
             _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) ?? new UserProfile
             {
                 Id = 15,
@@ -463,8 +442,7 @@
         }
         catch (Exception ex)
         {
-            // Если база упала, пишем ошибку и делаем фейковый профиль
-            Console.WriteLine($"Чё-то сломалось: {ex.Message}");
+            Console.WriteLine($" Something goes wrong : {ex.Message}");
             _currentUserProfile = new UserProfile
             {
                 Id = 1,
@@ -478,57 +456,30 @@
                 Bio = $"Чё-то не грузится: {ex.Message}"
             };
         }
-        _shopProducts = await LoadProductAsync();
+        _shopProducts = await ShopService.LoadProductsAsync();
     }
+    
+    
+    
+    
+    // Сортируем шмотки по выбранному критерию
+    private ShopBusinessService.SortOption _currentSort = ShopBusinessService.SortOption.None;
 
-    // Загружаем товары из базы данных
-    private async Task<List<ShopProductView>> LoadProductAsync()
+    private void OnSortChanged(ChangeEventArgs e)
     {
-        var products = new List<ShopProductView>();
-        var connString = Configuration.GetConnectionString("DefaultConnection");
-        
-        try
+        if (Enum.TryParse<ShopBusinessService.SortOption>(e.Value?.ToString(), out var opt))
         {
-            await using var conn = new NpgsqlConnection(connString);
-            await conn.OpenAsync();
-            
-            var cmd = new NpgsqlCommand(@"
-                SELECT shop_items.shop_item_id,
-                       shop_items.item_id,
-                       products.name,
-                       products.image_url,
-                       products.description,
-                       shop_items.price,
-                       shop_items.quantity, 
-                       shop_items.rarity
-                FROM shop_items
-                JOIN products ON shop_items.item_id = products.id
-                WHERE shop_items.available = true", conn);
-            
-            await using var reader = await cmd.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                products.Add(new ShopProductView
-                {
-                    ShopItemId = reader.GetInt32(0),
-                    ItemId = reader.GetInt32(1),
-                    Name = reader.GetString(2),
-                    ImageUrl = reader.GetString(3),
-                    Description = reader.GetString(4),
-                    Price = reader.GetDecimal(5),
-                    Quantity = reader.GetInt32(6),
-                    Rarity = reader.GetString(7)
-                });
-            }
+            _currentSort = opt;
+            ApplySorting();
         }
-        catch (Exception)
-        {
-            // Возвращаем пустой список если что-то пошло не так
-        }
-        
-        return products;
     }
 
+    private void ApplySorting()
+    {
+        _shopProducts = ShopBusinessService.SortProducts(_shopProducts, _currentSort);
+    }
+    
+    
     // Решаем, какую фотку показать для профиля
     private string GetAvatarUrl(UserProfile profile)
     {
@@ -549,58 +500,5 @@
         _selectedProduct = null;
     }
     
-    
-    private enum SortOption
-    {
-        None,
-        PriceAsc,
-        PriceDesc,
-        NameAsc,
-        NameDesc,
-        RarityAsc,  // по возрастанию «редкости» (зависит от порядка в enum или маппинга)
-        RarityDesc
-    }
-
-    private SortOption _currentSort = SortOption.None;
-    
-    private void ApplySorting()
-    {
-        _shopProducts = _currentSort switch
-        {
-            SortOption.PriceAsc  => _shopProducts.OrderBy(p => p.Price).ToList(),
-            SortOption.PriceDesc => _shopProducts.OrderByDescending(p => p.Price).ToList(),
-
-            SortOption.NameAsc   => _shopProducts.OrderBy(p => p.Name).ToList(),
-            SortOption.NameDesc  => _shopProducts.OrderByDescending(p => p.Name).ToList(),
-
-            // Для редкости нам нужен порядок: Common < Rare < Epic < Legendary
-            SortOption.RarityAsc => _shopProducts
-                .OrderBy(p => RarityRank(p.Rarity)).ToList(),
-            SortOption.RarityDesc => _shopProducts
-                .OrderByDescending(p => RarityRank(p.Rarity)).ToList(),
-
-            _ => _shopProducts
-        };
-    }
-
-// Помощник: присваиваем каждой строке числовой вес
-    private int RarityRank(string rarity) => rarity switch
-    {
-        "Common"    => 0,
-        "Uncommon"  => 1,
-        "Rare"      => 2,
-        "Epic"      => 3,
-        "Legendary" => 4,
-        _           => 0
-    };
-
-    private void OnSortChanged(ChangeEventArgs e)
-    {
-        if (Enum.TryParse<SortOption>(e.Value?.ToString(), out var opt))
-        {
-            _currentSort = opt;
-            ApplySorting();
-        }
-    }
 
 }
