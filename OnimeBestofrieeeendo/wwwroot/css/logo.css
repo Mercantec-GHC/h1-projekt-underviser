@@ -1,10 +1,10 @@
 .animated-logo {
     display: inline-block; /* Убедитесь, что элемент не ломает макет */
     animation: float 3s ease-in-out infinite; /* Анимация бесконечна */
-    position: relative; /* Это позволит применить смещение через 'top' */
-    right: 17vw; /* Отступ слева для позиционирования */
+    position: absolute; /* Делаем позиционирование абсолютным, как у animated-logo2 */
+    right: 40vw; /* Отступ слева для позиционирования */
+    top: -1vb; /* Перемещаем margin-top в top для абсолютного позиционирования */
     z-index: 1000; /* Убедитесь, что логотип поверх других элементов */
-    margin-top: -52vb;
 }
 
 /* Ключевые кадры для "плавания" вверх-вниз */
@@ -22,7 +22,7 @@
     animation: float-reverse 3s ease-in-out infinite; /* Новая анимация! */
     position: relative;
     left: 28vw;
-    top: -97vh;
+    top: -52vh;
     z-index: 900;
     width: auto;
     height: auto;
@@ -43,4 +43,105 @@
     50% {
         transform: translateY(1%); /* Направление ВНИЗ вместо -1% */
     }
+}
+
+.logo3{
+    position: absolute;
+    top: 2vb;
+    left: -2vb;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+}
+
+.lead {
+    font-size: 1rem;
+    color: white !important;
+    font-weight: 600;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1010;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-family: 'Alexandria', sans-serif;
+    margin-top: 50vb;
+    margin-right: 10vb;
+}
+
+
+
+@media  (max-width: 1200px) {
+    .animated-logo {
+        top: -6vb; /* Изменяем top вместо margin-top */
+        right: 39vw; /* Уменьшаем отступ справа */
+    }
+
+    .animated-logo img,
+    .animated-logo svg {
+        width: 700px; /* размер изображения */
+        height: auto; /* сохраняет пропорции */
+    }
+
+    .animated-logo2 {
+        top: -52vh;
+    }
+
+    .lead {
+        margin-top: 53vb;
+        left: -5vw; /* Убираем отступ слева */
+    }
+
+    /* Shop кнопка */
+    .nav-button-base-shop {
+        width: 23vw;
+        height: 18vw; /* Пропорционально увеличиваем высоту */
+        top: 48vh; /* Немного корректируем позицию */
+        right: 28vw; /* Сдвигаем левее для лучшего размещения */
+    }
+}
+
+
+
+@media  (max-width: 1366px) {
+    .animated-logo {
+        top: -8vb; /* Изменяем top вместо margin-top */
+        right: 42vw; /* Уменьшаем отступ справа */
+    }
+
+    .animated-logo img,
+    .animated-logo svg {
+        width: 695px; /* размер изображения */
+        height: auto; /* сохраняет пропорции */
+    }
+
+    .animated-logo2 {
+        top: -52vh;
+    }
+
+    .lead {
+        margin-top: 50vb;
+        left: -5vw; /* Убираем отступ слева */
+    }
+
+    /* Shop кнопка */
+    .nav-button-base-shop {
+        width: 23vw;
+        height: 18vw; /* Пропорционально увеличиваем высоту */
+        top: 48vh; /* Немного корректируем позицию */
+        right: 28vw; /* Сдвигаем левее для лучшего размещения */
+    }
+
+    .nav-button-base-contact {
+        width: 25vw;
+        height: 8vh; /* Пропорционально увеличиваем высоту */
+    }
+
+    .active-indicator-contact {
+        width: 8vw;
+        height: 4vh;
+        top: 1.4vh;
+        left: 12.5vw;
+    }
+    
+    
 }

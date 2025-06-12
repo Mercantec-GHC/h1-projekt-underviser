@@ -22,9 +22,9 @@
     transform: translate(-50%, -50%);
 }
 .nav-button-base-contact {
-    position: fixed;                 
+    position: fixed;
     width: 18vw;                      /* Адаптивная ширина. Можно задать в %, px, rem */
-    height: 8vw;                     
+    height: 8vw;
     top: 50vh;                       /* Расположение кнопки относительно верхнего края экрана */
     left: 10vw;                      /* Расположение кнопки относительно левого края экрана */
     border: none;                    /* Убираем рамку кнопки */
@@ -214,8 +214,8 @@
     top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 10vw; 
-    height: 4vh; 
+    width: 10vw;
+    height: 4vh;
     pointer-events: none; /* Игнорирование кликов по гифке */
 }
 
@@ -249,7 +249,7 @@
     left: 7vw;
 }
 
-/* Медиа-запросы */ 
+/* Медиа-запросы */
 
 @media (max-width: 900px) {
     .nav-button-home {
@@ -336,7 +336,7 @@
         height: 8vw !important;
         transition: all 0.3s ease;
     }
-    
+
     .nav-button-base-shop:hover {
         transform: scale(1.05) rotate(1deg);
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25)) brightness(1.05);
@@ -351,7 +351,7 @@
         height: 9vw !important;
         transition: all 0.3s ease;
     }
-    
+
     .nav-button-base-shop:hover {
         transform: scale(1.08) rotate(1.5deg);
         filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3)) brightness(1.08);
@@ -833,18 +833,18 @@
         height: 10vw !important;
         transition: all 0.3s ease;
     }
-    
+
     .nav-button-base-shop:hover {
         transform: scale(1.1) rotate(2deg);
         filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35)) brightness(1.1) contrast(1.05);
         animation: glitch-small 0.2s ease-in-out;
     }
-    
+
     .nav-button-base-shop:active {
         transform: scale(0.95) rotate(-1deg);
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
-    
+
     @keyframes glitch-small {
         0% { transform: scale(1.1) rotate(2deg); }
         25% { transform: scale(1.12) rotate(2deg) translate(1px, 0); }
