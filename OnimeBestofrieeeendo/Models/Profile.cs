@@ -1,4 +1,4 @@
-namespace Onime.Models
+namespace OnimeBestofrieeeendo
 {
     public class UserProfile
     {
