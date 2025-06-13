@@ -1,6 +1,5 @@
-
 using Npgsql;
-using OnimeBestofrieeeendo.Components.Pages;
+using OnimeBestofrieeeendo.Models;
 
 namespace OnimeBestofrieeeendo.Components.Services;
 
@@ -14,9 +13,7 @@ public class ContactService
         _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
     }
 
-    public async Task SaveContactAsync(Home.ContactFormModel contact)
-    {
-        try
+        public async Task SaveContactAsync(ContactFormModel contact)
         {
             await using var conn = new NpgsqlConnection(_connectionString);
             await conn.OpenAsync();
@@ -29,11 +26,5 @@ public class ContactService
 
             await cmd.ExecuteNonQueryAsync();
         }
-        catch (Exception)
-        {
-            // Простая обработка ошибок
-            throw;
-        }
-    }
     
 }
