@@ -10,43 +10,34 @@
 
 <!-- ==================== ГЛАВНАЯ СЕКЦИЯ ==================== -->
 
+<!-- ===== MAIN SECTION ===== -->
+<!-- This is the main hero section with logo and slogan -->
 <section id="home" class="section">
     <div class="container">
-        
         <FloatingParticles />
-        
         <div class="hero-description">
-            <p class="lead">AnimeWorld: Be the hero.<br>
-                Rule your world.</p>
+            <p class="lead">AnimeWorld: Be the hero.<br>Rule your world.</p>
         </div>
-        
         <div class="hero-content">
-            
             <h1 class="animated-logo">
                 <img src="/images/logo.svg" alt="The Onime World"/>
             </h1>
-
             <h2 class="animated-logo2">
                 <img src="/images/logo1.svg" alt="The Onime World"/>
             </h2>
-            
             <h2 class="logo3">
                 <img src="/images/japan.svg" alt="The Onime World"/>
-                </h2>
+            </h2>
         </div>
-        
     </div>
 </section>
 
-<!-- ==================== СЕКЦИЯ ТОВАРОВ ==================== -->
-
+<!-- ===== PRODUCTS SECTION ===== -->
+<!-- Here are all the products and sorting panel -->
 <section id="products" class="section">
-    
     <div class="container-full">
-        <!-- Панель сортировки -->
-<!-- добавил кандзи и все ониме -->
-        <FloatingParticles />  
-      
+        <!-- Sorting panel for products -->
+        <FloatingParticles />
         <div class="products-wrapper">
             <div class="sorting-panel">
                 <label for="sortSelect">Sort by:</label>
@@ -60,7 +51,6 @@
                     <option value="RarityDesc">Rarity ↓</option>
                 </select>
             </div>
-            
             <div class="products-grid">
                 @foreach (var product in _shopProducts)
                 {
@@ -83,15 +73,12 @@
     </div>
 </section>
 
-
-<!-- ==================== ПОП-АП С ИНФОИ==================== -->
-<!-- Это типа окошко, где больше инфы про шмотку -->
+<!-- ===== PRODUCT INFO POPUP ===== -->
+<!-- Popup for more info about a product -->
 @if (_selectedProduct != null)
 {
     <div class="modal-overlay" @onclick="CloseModal">
-        <!-- Кликнул на фон — окошко закрылось -->
         <div class="modal-content" @onclick:stopPropagation>
-            <!-- А внутри кликаешь — и оно не исчезает -->
             <button class="close-btn" @onclick="CloseModal">X</button>
             <h3>@_selectedProduct.Name</h3>
             <p>@_selectedProduct.Description</p>
@@ -100,8 +87,8 @@
     </div>
 }
 
-<!-- ==================== СЕКЦИЯ КАТЕГОРИЙ ==================== -->
-<!-- Тут типа группы шмоток, как фильтры -->
+<!-- ===== CATEGORIES SECTION ===== -->
+<!-- Product categories like filters -->
 <section id="categories" class="section">
     <div class="container">
         <h2>Категории</h2>
@@ -122,18 +109,15 @@
     </div>
 </section>
 
-<!-- ==================== СЕКЦИЯ ПРОФИЛЯ ==================== -->
-<!-- Это твоя страничка, где вся инфа про тебя -->
+<!-- ===== PROFILE SECTION ===== -->
+<!-- This is your profile info section -->
 <section id="profile" class="section profile-section">
-    
     <div class="container">
         <h2>Min Profil</h2>
-
         @if (_currentUserProfile != null)
         {
             <div class="profile-container">
                 <div class="profile-avatar">
-                    <!-- Показываем фотку или дефолтную, если фотки нет -->
                     <img src="@GetAvatarUrl(_currentUserProfile)" alt="@_currentUserProfile.Username"/>
                     <div class="profile-level">
                         <span>LVL @_currentUserProfile.Level</span>
@@ -171,9 +155,8 @@
     </div>
 </section>
 
-
-<!-- ==================== СЕКЦИЯ КОНТАКТЫ И О НАС ==================== -->
-
+<!-- ===== CONTACT & ABOUT SECTION ===== -->
+<!-- Here is about us, contacts, FAQ, and contact form -->
 <section id="contact" class="section contact-section">
     <div class="container">
         <div class="section-header">
@@ -181,8 +164,12 @@
             <div class="header-line"></div>
         </div>
         
+        
+        
+        
+        
         <div class="contact-grid">
-            <!-- Колонка О нас -->
+            <!-- About us column -->
             <div class="contact-column about-us-column">
                 <div class="contact-card">
                     <h3 class="card-title">Our Stand</h3>
@@ -208,7 +195,11 @@
                 </div>
             </div>
             
-            <!-- Колонка Контакты -->
+            
+            
+            
+            
+            <!-- Contacts column -->
             <div class="contact-column contact-info-column">
                 <div class="contact-card">
                     <h3 class="card-title">Avoid us or do it</h3>
@@ -235,7 +226,6 @@
                             </div>
                         </a>
                     </div>
-                    
                     <div class="social-media">
                         <h4>Our Soul</h4>
                         <div class="social-icons">
@@ -253,11 +243,16 @@
                 </div>
             </div>
             
-            <!-- Колонка FAQ -->
+            
+            
+            
+            
+            <!-- FAQ column -->
             <div class="contact-column faq-column">
                 <div class="contact-card">
                     <h3 class="card-title">Brain Boost Zone</h3>
                     <div class="faq-container">
+                        <!-- FAQ items go here -->
                         <div class="faq-item">
                             <button class="faq-question" @onclick="() => ToggleFaq(0)">
                                 How long does delivery take?
@@ -299,7 +294,10 @@
                 </div>
             </div>
             
-            <!-- Форма обратной связи -->
+            
+            
+            
+            <!-- Contact form column -->
             <div class="contact-form-container">
                 <div class="contact-card form-card">
                     <h3 class="card-title">Speak your mind. We’re listening… maybe.</h3>
@@ -328,96 +326,35 @@
                     </EditForm>
                 </div>
             </div>
-            
         </div>
-        
     </div>
 </section>
 
 
 @code {
-    private int _expandedFaqIndex = -1;
-    
-    private ContactFormModel _contactForm = new ContactFormModel();
-    
-    private void ToggleFaq(int index)
-    {
-        _expandedFaqIndex = (_expandedFaqIndex == index) ? -1 : index;
-    }
-    
-    private async Task SubmitContactForm()
+    // ===== PROFILE STUFF =====
+    // Here we keep info about users and load their profiles
+    private List<UserProfile> _profiles = new();
+    private readonly int _currentUserId = 1; // just using 1 for now
+    private UserProfile? _currentUserProfile;
+
+    // Loads user profile from service
+    private async Task LoadUserProfileAsync()
     {
         try
         {
-            await ContactService.SaveContactAsync(_contactForm);
-            await ShowPopup("Thank you!", "Your message has been sent. We will contact you soon, but remember — my STAND is \"The World\".");
-            ResetContactForm();
-            StateHasChanged();
+            _profiles = await UserProfileService.LoadProfilesAsync();
+            _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) 
+                                  ?? CreateFallbackProfile();
         }
         catch (Exception ex)
         {
-            await ShowPopup("Error", "Something went wrong. Please try again later.");
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($" Something goes wrong : {ex.Message}");
+            _currentUserProfile = CreateFallbackProfile(ex);
         }
     }
-    
-    public class ContactFormModel
-    {
-        [Required(ErrorMessage = "Haha, are you ashamed to enter your name? Come on, show me your stand!")]
-        public string Name { get; set; } = "";
-        
-        [Required(ErrorMessage = "Email! Give me your email!!!")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
-        public string Email { get; set; } = "";
-        
-        [Required(ErrorMessage = "Subject is required, bro!")]
-        public string Subject { get; set; } = "";
-        
-        [Required(ErrorMessage = "Is that all you can do? Just say what you really want — write your own text already!")]
-        public string Message { get; set; } = "";
-    }
 
-
-    private async Task BuyProduct(ShopProductView product)
-    {
-        if (_currentUserProfile == null)
-            return;
-
-        if (!CanBuyProduct(product))
-        {
-            await ShowPopup("Oops! Not enough money 🤷‍♂️", "Go sell your soul or start hustling, buddy!");
-            return;
-        }
-
-        var success = await ShopService.BuyProductAsync(_currentUserProfile.Id, product);
-
-        if (success)
-        {
-            await ShowPopup("Congrats 🎉", $"You bought: {product.Name}!");
-            _shopProducts = await ShopService.LoadProductsAsync();
-            _currentUserProfile.Balance -= product.Price;
-            StateHasChanged();
-        }
-        else
-        {
-            await ShowPopup("Error😵", "Something went wrong while buying the product. Please try again later.");
-        }
-    }
-    
-    // ==================== НАШИ ШМОТКИ И ДАННЫЕ ====================
-    // Список всех шмоток в магазе
-    private List<ShopProductView> _shopProducts = new();
-    // Все профили юзеров
-    private List<UserProfile> _profiles = new();
-    // Айдишка текущего юзера, пока просто 1
-    private readonly int _currentUserId = 1;
-    // Профиль того, кто сейчас смотрит
-    private UserProfile? _currentUserProfile;
-    // Шмотка, которую выбрали для поп-апа
-    private ShopProductView? _selectedProduct;
-    
-    // ==================== ФУНКЦИИ ====================
-// Создаем запасной профиль когда что-то пошло не так
+    // Makes a fake profile if something is broken
     private UserProfile CreateFallbackProfile(Exception? ex = null)
     {
         if (ex != null)
@@ -449,38 +386,28 @@
             Bio = "DEMO - ALERT - DB IS NOT WORKING, PLEASE CONTACT THE ADMINISTRATOR"
         };
     }
-    
-  // Загружаем профиль пользователя
-private async Task LoadUserProfileAsync()
-{
-    try
+
+    // Gets avatar or default pic
+    private string GetAvatarUrl(UserProfile profile)
     {
-        _profiles = await UserProfileService.LoadProfilesAsync();
-        _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) 
-                              ?? CreateFallbackProfile();
+        if (string.IsNullOrWhiteSpace(profile.AvatarUrl))
+            return "/images/default-avatar.jpg";
+        return UserProfileService.GetAvatarUrl(profile);
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Something goes wrong : {ex.Message}");
-        _currentUserProfile = CreateFallbackProfile(ex);
-    }
-}
-    
-    // Загружаем товары из магазина
-private async Task LoadProductsAsync()
-{
-    _shopProducts = await ShopService.LoadProductsAsync();
-}
-    // Грузим всё, когда страница запускается
-protected override async Task OnInitializedAsync()
-{
-    await LoadUserProfileAsync();
-    await LoadProductsAsync();
-}
-    
-    // Сортируем шмотки по выбранному критерию
+
+    // ===== PRODUCTS STUFF =====
+    // Here we keep info about products and how to buy/sort them
+    private List<ShopProductView> _shopProducts = new();
+    private ShopProductView? _selectedProduct;
     private ShopBusinessService.SortOption _currentSort = ShopBusinessService.SortOption.None;
 
+    // Loads products from shop
+    private async Task LoadProductsAsync()
+    {
+        _shopProducts = await ShopService.LoadProductsAsync();
+    }
+
+    // Sorts products when user changes sort option
     private void OnSortChanged(ChangeEventArgs e)
     {
         if (Enum.TryParse<ShopBusinessService.SortOption>(e.Value?.ToString(), out var opt))
@@ -490,47 +417,123 @@ protected override async Task OnInitializedAsync()
         }
     }
 
+    // Actually sorts the products
     private void ApplySorting()
     {
         _shopProducts = ShopBusinessService.SortProducts(_shopProducts, _currentSort);
     }
-    
-    
-    // Решаем, какую фотку показать для профиля
-    private string GetAvatarUrl(UserProfile profile)
-    {
-        if (string.IsNullOrWhiteSpace(profile.AvatarUrl))
-            return "/images/default-avatar.jpg";
-        return UserProfileService.GetAvatarUrl(profile);
-    }
 
-    
-    // Показываем поп-ап с инфой про шмотку
+    // Shows popup with product info
     private void ShowProductDetails(ShopProductView product)
     {
         _selectedProduct = product;
     }
-    
 
-    // Закрываем поп-ап
+    // Closes the popup
     private void CloseModal()
     {
         _selectedProduct = null;
     }
-    
-    private async Task ShowPopup(string title, string message)
-    {
-        await JsRuntime.InvokeVoidAsync("showFunnyPopup", title, message);
-    }
 
+    // Checks if user can buy the product
     private bool CanBuyProduct(ShopProductView product)
     {
         return _currentUserProfile != null && _currentUserProfile.Balance >= product.Price;
     }
 
+    // Handles buying a product
+    private async Task BuyProduct(ShopProductView product)
+    {
+        if (_currentUserProfile == null)
+            return;
+
+        if (!CanBuyProduct(product))
+        {
+            await ShowPopup("Oops! Not enough money 🤷‍♂️", "Go sell your soul or start hustling, buddy!");
+            return;
+        }
+
+        var success = await ShopService.BuyProductAsync(_currentUserProfile.Id, product);
+
+        if (success)
+        {
+            await ShowPopup("Congrats 🎉", $"You bought: {product.Name}!");
+            _shopProducts = await ShopService.LoadProductsAsync();
+            _currentUserProfile.Balance -= product.Price;
+            StateHasChanged();
+        }
+        else
+        {
+            await ShowPopup("Error😵", "Something went wrong while buying the product. Please try again later.");
+        }
+    }
+
+    // ===== CONTACT FORM STUFF =====
+    // This is for the contact form and sending messages
+    private ContactFormModel _contactForm = new ContactFormModel();
+
+    // Sends the contact form
+    private async Task SubmitContactForm()
+    {
+        try
+        {
+            await ContactService.SaveContactAsync(_contactForm);
+            await ShowPopup("Thank you!", "Your message has been sent. We will contact you soon, but remember — my STAND is \"The World\".");
+            ResetContactForm();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await ShowPopup("Error", "Something went wrong. Please try again later.");
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    // Resets the contact form
     private void ResetContactForm()
     {
         _contactForm = new ContactFormModel();
     }
 
+    // The model for the contact form
+    public class ContactFormModel
+    {
+        [Required(ErrorMessage = "Haha, are you ashamed to enter your name? Come on, show me your stand!")]
+        public string Name { get; set; } = "";
+        
+        [Required(ErrorMessage = "Email! Give me your email!!!")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = "";
+        
+        [Required(ErrorMessage = "Subject is required, bro!")]
+        public string Subject { get; set; } = "";
+        
+        [Required(ErrorMessage = "Is that all you can do? Just say what you really want — write your own text already!")]
+        public string Message { get; set; } = "";
+    }
+
+    // ===== FAQ STUFF =====
+    // This is for the FAQ section
+    private int _expandedFaqIndex = -1;
+
+    // Opens or closes FAQ answers
+    private void ToggleFaq(int index)
+    {
+        _expandedFaqIndex = (_expandedFaqIndex == index) ? -1 : index;
+    }
+
+    // ===== HELPERS =====
+    // Just a helper to show popups
+    private async Task ShowPopup(string title, string message)
+    {
+        await JsRuntime.InvokeVoidAsync("showFunnyPopup", title, message);
+    }
+
+    // ===== PAGE INIT =====
+    // Loads everything when page starts
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserProfileAsync();
+        await LoadProductsAsync();
+    }
 }
