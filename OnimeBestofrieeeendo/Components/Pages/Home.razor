@@ -4,9 +4,9 @@
 @rendermode InteractiveServer
 @using System.ComponentModel.DataAnnotations;
 @inject ContactService ContactService
-@inject OnimeBestofrieeeendo.Components.Services.UserProfileService UserProfileService
-@inject OnimeBestofrieeeendo.Components.Services.ShopService ShopService
-@inject OnimeBestofrieeeendo.Components.Services.ShopBusinessService ShopBusinessService
+@inject UserProfileService UserProfileService
+@inject ShopService ShopService
+@inject ShopBusinessService ShopBusinessService
 
 
 <!-- ==================== ГЛАВНАЯ СЕКЦИЯ ==================== -->
@@ -418,49 +418,68 @@
     private UserProfile? _currentUserProfile;
     // Шмотка, которую выбрали для поп-апа
     private ShopProductView? _selectedProduct;
-
+    
     // ==================== ФУНКЦИИ ====================
-
-    // Грузим всё, когда страница запускается
-    protected override async Task OnInitializedAsync()
+// Создаем запасной профиль когда что-то пошло не так
+    private UserProfile CreateFallbackProfile(string reason, Exception? ex = null)
     {
-        try
+        if (ex != null)
         {
-            _profiles = await UserProfileService.LoadProfilesAsync();
-            _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) ?? new UserProfile
+            return new UserProfile
             {
-                Id = 15,
-                Username = "Демо Чел",
-                Email = "demo@example.com",
-                JoinDate = DateTime.Now.AddDays(-100),
-                Balance = 10000,
-                Role = "DEMO",
-                AvatarUrl = "/images/default-avatar.jpg",
-                Level = 100,
-                Bio = "DEMO - ALLARM - DB IS NOR WORKING, PLEASE CONTACT ADMINISTRATOR"
-            };
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($" Something goes wrong : {ex.Message}");
-            _currentUserProfile = new UserProfile
-            {
-                Id = 1,
-                Username = "Ошибка Чел",
+                Id = 10,
+                Username = "Error Guy",
                 Email = "error@example.com",
                 JoinDate = DateTime.Now,
                 Balance = 999,
-                Role = "Ошибка",
+                Role = "Error",
                 AvatarUrl = "/images/default-avatar.jpg",
-                Level = 1,
-                Bio = $"Чё-то не грузится: {ex.Message}"
+                Level = 10,
+                Bio = $"Something went wrong: {ex.Message}"
             };
         }
-        _shopProducts = await ShopService.LoadProductsAsync();
+    
+        return new UserProfile
+        {
+            Id = 15,
+            Username = "Demo Guy",
+            Email = "demo@example.com",
+            JoinDate = DateTime.Now.AddDays(-100),
+            Balance = 10000,
+            Role = "DEMO",
+            AvatarUrl = "/images/default-avatar.jpg",
+            Level = 100,
+            Bio = "DEMO - ALERT - DB IS NOT WORKING, PLEASE CONTACT THE ADMINISTRATOR"
+        };
     }
     
+  // Загружаем профиль пользователя
+private async Task LoadUserProfileAsync()
+{
+    try
+    {
+        _profiles = await UserProfileService.LoadProfilesAsync();
+        _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) 
+                              ?? CreateFallbackProfile("User not found");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($" Something goes wrong : {ex.Message}");
+        _currentUserProfile = CreateFallbackProfile("Error loading profile", ex);
+    }
+}
     
-    
+    // Загружаем товары из магазина
+private async Task LoadProductsAsync()
+{
+    _shopProducts = await ShopService.LoadProductsAsync();
+}
+    // Грузим всё, когда страница запускается
+protected override async Task OnInitializedAsync()
+{
+    await LoadUserProfileAsync();
+    await LoadProductsAsync();
+}
     
     // Сортируем шмотки по выбранному критерию
     private ShopBusinessService.SortOption _currentSort = ShopBusinessService.SortOption.None;
@@ -488,11 +507,13 @@
         return UserProfileService.GetAvatarUrl(profile);
     }
 
+    
     // Показываем поп-ап с инфой про шмотку
     private void ShowProductDetails(ShopProductView product)
     {
         _selectedProduct = product;
     }
+    
 
     // Закрываем поп-ап
     private void CloseModal()

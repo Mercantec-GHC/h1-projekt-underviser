@@ -59,15 +59,24 @@ namespace OnimeBestofrieeeendo.Components.Services
             return profiles;
         }
 
+
         public string GetAvatarUrl(UserProfile profile)
         {
             if (string.IsNullOrWhiteSpace(profile.AvatarUrl))
             {
                 return "/images/default-avatar.jpg";
             }
+
+            // Если это URL (начинается с http/https) - возвращаем как есть
+            if (profile.AvatarUrl.StartsWith("http://") || profile.AvatarUrl.StartsWith("https://"))
+            {
+                return profile.AvatarUrl;
+            }
+
+            // Если это локальный путь - проверяем существование файла
             var avatarPath = profile.AvatarUrl.StartsWith("/") ? profile.AvatarUrl : "/" + profile.AvatarUrl;
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", avatarPath.TrimStart('/'));
-            return File.Exists(fullPath) ? avatarPath : "/images/default-avatar.svg";
+            return File.Exists(fullPath) ? avatarPath : "/images/default-avatar.jpg";
         }
 
 
