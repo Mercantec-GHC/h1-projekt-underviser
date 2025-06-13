@@ -20,7 +20,8 @@ Language: C#
 │ ├── Services/ # Business logic
 │ └── Layout/ # Page layouts
 ├── Models/ # Data models
-└── wwwroot/ # Static files (CSS, images, JS)```
+└── wwwroot/ # Static files (CSS, images, JS)
+```
 
 🚀 Sådan kører du det
 Krav:
@@ -30,7 +31,8 @@ PostgreSQL-database
 
 1. Klon projektet
 2. Kopiér og indsæt følgende indstillinger i din appsettings.json:
-   {
+``` 
+  {
   "Logging": {
     "LogLevel": {
       "Default": "Information",
@@ -42,4 +44,5 @@ PostgreSQL-database
   },
   "AllowedHosts": "*"
 }
+```
 3. Kør applikationen
