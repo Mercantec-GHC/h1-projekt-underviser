@@ -350,15 +350,13 @@
         try
         {
             await ContactService.SaveContactAsync(_contactForm);
-
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Thank you!", "Your message has been sent. We will contact you soon, but remember — my STAND is \"The World\".");
-
-            _contactForm = new ContactFormModel();
+            await ShowPopup("Thank you!", "Your message has been sent. We will contact you soon, but remember — my STAND is \"The World\".");
+            ResetContactForm();
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Error", "Something went wrong. Please try again later.");
+            await ShowPopup("Error", "Something went wrong. Please try again later.");
             Console.WriteLine(ex.Message);
         }
     }
@@ -385,9 +383,9 @@
         if (_currentUserProfile == null)
             return;
 
-        if (_currentUserProfile.Balance < product.Price)
+        if (!CanBuyProduct(product))
         {
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Oops! Not enough money 🤷‍♂️", "Go sell your soul or start hustling, buddy!");
+            await ShowPopup("Oops! Not enough money 🤷‍♂️", "Go sell your soul or start hustling, buddy!");
             return;
         }
 
@@ -395,14 +393,14 @@
 
         if (success)
         {
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Congrats 🎉", $"You bought: {product.Name}!");
+            await ShowPopup("Congrats 🎉", $"You bought: {product.Name}!");
             _shopProducts = await ShopService.LoadProductsAsync();
             _currentUserProfile.Balance -= product.Price;
             StateHasChanged();
         }
         else
         {
-            await JsRuntime.InvokeVoidAsync("showFunnyPopup", "Error😵", "Something went wrong while buying the product. Please try again later.");
+            await ShowPopup("Error😵", "Something went wrong while buying the product. Please try again later.");
         }
     }
     
@@ -520,5 +518,19 @@ protected override async Task OnInitializedAsync()
         _selectedProduct = null;
     }
     
+    private async Task ShowPopup(string title, string message)
+    {
+        await JsRuntime.InvokeVoidAsync("showFunnyPopup", title, message);
+    }
+
+    private bool CanBuyProduct(ShopProductView product)
+    {
+        return _currentUserProfile != null && _currentUserProfile.Balance >= product.Price;
+    }
+
+    private void ResetContactForm()
+    {
+        _contactForm = new ContactFormModel();
+    }
 
 }
