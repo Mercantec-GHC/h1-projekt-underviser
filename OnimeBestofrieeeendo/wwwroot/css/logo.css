@@ -115,25 +115,26 @@
     }
 
     .animated-logo2 {
-        top: -52vh;
+        top: -62vh;
     }
 
     .lead {
-        margin-top: 50vb;
-        left: -5vw; /* Убираем отступ слева */
+        margin-top: 57vb;
+        left: -7vw; /* Убираем отступ слева */
     }
 
     /* Shop кнопка */
     .nav-button-base-shop {
         width: 23vw;
         height: 18vw; /* Пропорционально увеличиваем высоту */
-        top: 48vh; /* Немного корректируем позицию */
+        top: 58vh; /* Немного корректируем позицию */
         right: 28vw; /* Сдвигаем левее для лучшего размещения */
     }
 
     .nav-button-base-contact {
         width: 25vw;
         height: 8vh; /* Пропорционально увеличиваем высоту */
+        top: 58vh; /* Немного корректируем позицию */
     }
 
     .active-indicator-contact {
