@@ -3,14 +3,9 @@ using OnimeBestofrieeeendo.Models;
 
 namespace OnimeBestofrieeeendo.Components.Services
 {
-    public class UserProfileService
+    public class UserProfileService(IConfiguration configuration)
     {
-        private readonly string _connString;
-
-        public UserProfileService(IConfiguration configuration)
-        {
-            _connString = configuration.GetConnectionString("DefaultConnection") ?? "";
-        }
+        private readonly string _connString = configuration.GetConnectionString("DefaultConnection") ?? "";
 
         public async Task<List<UserProfile>> LoadProfilesAsync()
         {

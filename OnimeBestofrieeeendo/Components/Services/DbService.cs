@@ -4,14 +4,9 @@ using OnimeBestofrieeeendo.Models;
 namespace OnimeBestofrieeeendo.Components.Services
 
 {
-    public class DbService
+    public class DbService(IConfiguration configuration)
     {
-        private readonly string? _connectionString;
-
-        public DbService(IConfiguration configuration)
-        {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
-        }
+        private readonly string? _connectionString = configuration.GetConnectionString("DefaultConnection");
 
         public async Task<List<TradeItems>> GetShopItemsAsync()
         {
