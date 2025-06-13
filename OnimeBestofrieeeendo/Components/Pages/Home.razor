@@ -6,6 +6,7 @@
 @inject UserProfileService UserProfileService
 @inject ShopService ShopService
 @inject ShopBusinessService ShopBusinessService
+@using OnimeBestofrieeeendo.Models
 
 
 <!-- ==================== ГЛАВНАЯ СЕКЦИЯ ==================== -->
@@ -350,40 +351,24 @@
         catch (Exception ex)
         {
             Console.WriteLine($" Something goes wrong : {ex.Message}");
-            _currentUserProfile = CreateFallbackProfile(ex);
+            _currentUserProfile = CreateFallbackProfile();
         }
     }
 
     // Makes a fake profile if something is broken
-    private UserProfile CreateFallbackProfile(Exception? ex = null)
+     private UserProfile CreateFallbackProfile()
     {
-        if (ex != null)
-        {
-            return new UserProfile
-            {
-                Id = 10,
-                Username = "Error Guy",
-                Email = "error@example.com",
-                JoinDate = DateTime.Now,
-                Balance = 999,
-                Role = "Error",
-                AvatarUrl = "/images/default-avatar.jpg",
-                Level = 10,
-                Bio = $"Something went wrong: {ex.Message}"
-            };
-        }
-    
         return new UserProfile
         {
-            Id = 15,
-            Username = "Demo Guy",
+            Id = 1,
+            Username = "Demo User",
             Email = "demo@example.com",
-            JoinDate = DateTime.Now.AddDays(-100),
-            Balance = 10000,
-            Role = "DEMO",
+            JoinDate = DateTime.Now.AddDays(-30),
+            Balance = 5000,
+            Role = "Demo",
             AvatarUrl = "/images/default-avatar.jpg",
-            Level = 100,
-            Bio = "DEMO - ALERT - DB IS NOT WORKING, PLEASE CONTACT THE ADMINISTRATOR"
+            Level = 50,
+            Bio = "Demo profile - database connection not available"
         };
     }
 
@@ -494,23 +479,7 @@
     {
         _contactForm = new ContactFormModel();
     }
-
-    // The model for the contact form
-    public class ContactFormModel
-    {
-        [Required(ErrorMessage = "Haha, are you ashamed to enter your name? Come on, show me your stand!")]
-        public string Name { get; set; } = "";
-        
-        [Required(ErrorMessage = "Email! Give me your email!!!")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
-        public string Email { get; set; } = "";
-        
-        [Required(ErrorMessage = "Subject is required, bro!")]
-        public string Subject { get; set; } = "";
-        
-        [Required(ErrorMessage = "Is that all you can do? Just say what you really want — write your own text already!")]
-        public string Message { get; set; } = "";
-    }
+    
 
     // ===== FAQ STUFF =====
     // This is for the FAQ section
