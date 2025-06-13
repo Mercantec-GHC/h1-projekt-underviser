@@ -247,50 +247,23 @@
             
             
             
-            
             <!-- FAQ column -->
             <div class="contact-column faq-column">
                 <div class="contact-card">
                     <h3 class="card-title">Brain Boost Zone</h3>
                     <div class="faq-container">
-                        <!-- FAQ items go here -->
-                        <div class="faq-item">
-                            <button class="faq-question" @onclick="() => ToggleFaq(0)">
-                                How long does delivery take?
-                                <span class="faq-icon">@(_expandedFaqIndex == 0 ? "−" : "+")</span>
-                            </button>
-                            <div class="faq-answer @(_expandedFaqIndex == 0 ? "expanded" : "")">
-                                Delivery within Denmark takes 1-3 business days. International delivery - 7-14 days depending on the country.
-                                Sorry for the delay, this is because our top delivery man Satoru Gojo is not with us
-                            </div>
-                        </div>
-                        <div class="faq-item">
-                            <button class="faq-question" @onclick="() => ToggleFaq(1)">
-                                Is it possible to return the product?
-                                <span class="faq-icon">@(_expandedFaqIndex == 1 ? "−" : "+")</span>
-                            </button>
-                            <div class="faq-answer @(_expandedFaqIndex == 1 ? "expanded" : "")">
-                                Yes, within 14 days. The item must be in perfect condition with tags. But think about it, would Jotaro have returned Mother's soul if he had lost?!
-                            </div>
-                        </div>
-                        <div class="faq-item">
-                            <button class="faq-question" @onclick="() => ToggleFaq(2)">
-                                How to determine your size?
-                                <span class="faq-icon">@(_expandedFaqIndex == 2 ? "−" : "+")</span>
-                            </button>
-                            <div class="faq-answer @(_expandedFaqIndex == 2 ? "expanded" : "")">
-                                Measure yourself with a flexible tape and compare it with the size chart. If you’re unsure, choose the larger size.
-                            </div>
-                        </div>
-                        <div class="faq-item">
-                            <button class="faq-question" @onclick="() => ToggleFaq(3)">
-                                Where are your products manufactured?
-                                <span class="faq-icon">@(_expandedFaqIndex == 3 ? "−" : "+")</span>
-                            </button>
-                            <div class="faq-answer @(_expandedFaqIndex == 3 ? "expanded" : "")">
-                                We work with the best factories around the world, focusing on quality and ethical production. I may have sewn something...
-                            </div>
-                        </div>
+                        <!-- FAQ items using the new FaqItem component -->
+                        <FaqItem Question="How long does delivery take?" 
+                                 Answer="Delivery within Denmark takes 1-3 business days. International delivery - 7-14 days depending on the country. Sorry for the delay, this is because our top delivery man Satoru Gojo is not with us" />
+                        
+                        <FaqItem Question="Is it possible to return the product?" 
+                                 Answer="Yes, within 14 days. The item must be in perfect condition with tags. But think about it, would Jotaro have returned Mother's soul if he had lost?!" />
+                        
+                        <FaqItem Question="How to determine your size?" 
+                                 Answer="Measure yourself with a flexible tape and compare it with the size chart. If you're unsure, choose the larger size." />
+                        
+                        <FaqItem Question="Where are your products manufactured?" 
+                                 Answer="We work with the best factories around the world, focusing on quality and ethical production. I may have sewn something..." />
                     </div>
                 </div>
             </div>
@@ -339,6 +312,15 @@
     private readonly int _currentUserId = 1; // just using 1 for now
     private UserProfile? _currentUserProfile;
 
+    // Loads all page data (profile and products)
+    private async Task LoadPageDataAsync()
+    {
+        await Task.WhenAll(
+            LoadUserProfileAsync(),
+            LoadProductsAsync()
+        );
+    }
+
     // Loads user profile from service
     private async Task LoadUserProfileAsync()
     {
@@ -353,6 +335,12 @@
             Console.WriteLine($" Something goes wrong : {ex.Message}");
             _currentUserProfile = CreateFallbackProfile();
         }
+    }
+
+    // Loads products from shop
+    private async Task LoadProductsAsync()
+    {
+        _shopProducts = await ShopService.LoadProductsAsync();
     }
 
     // Makes a fake profile if something is broken
@@ -385,12 +373,6 @@
     private List<ShopProductView> _shopProducts = new();
     private ShopProductView? _selectedProduct;
     private ShopBusinessService.SortOption _currentSort = ShopBusinessService.SortOption.None;
-
-    // Loads products from shop
-    private async Task LoadProductsAsync()
-    {
-        _shopProducts = await ShopService.LoadProductsAsync();
-    }
 
     // Sorts products when user changes sort option
     private void OnSortChanged(ChangeEventArgs e)
@@ -479,17 +461,6 @@
     {
         _contactForm = new ContactFormModel();
     }
-    
-
-    // ===== FAQ STUFF =====
-    // This is for the FAQ section
-    private int _expandedFaqIndex = -1;
-
-    // Opens or closes FAQ answers
-    private void ToggleFaq(int index)
-    {
-        _expandedFaqIndex = (_expandedFaqIndex == index) ? -1 : index;
-    }
 
     // ===== HELPERS =====
     // Just a helper to show popups
@@ -502,7 +473,6 @@
     // Loads everything when page starts
     protected override async Task OnInitializedAsync()
     {
-        await LoadUserProfileAsync();
-        await LoadProductsAsync();
+        await LoadPageDataAsync();
     }
 }

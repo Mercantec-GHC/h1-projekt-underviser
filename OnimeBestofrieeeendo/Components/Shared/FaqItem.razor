@@ -1,0 +1,25 @@
+@* FAQ Item Component - Shows one question and answer *@
+<div class="faq-item">
+    <button class="faq-question" @onclick="ToggleAnswer">
+        @Question
+        <span class="faq-icon">@(_isExpanded ? "−" : "+")</span>
+    </button>
+    <div class="faq-answer @(_isExpanded ? "expanded" : "")">
+        @Answer
+    </div>
+</div>
+
+@code {
+    // Properties that parent component can set
+    [Parameter] public string Question { get; set; } = "";
+    [Parameter] public string Answer { get; set; } = "";
+    
+    // Internal state - only this component controls it
+    private bool _isExpanded = false;
+    
+    // Simple method to show/hide answer
+    private void ToggleAnswer()
+    {
+        _isExpanded = !_isExpanded;
+    }
+}
