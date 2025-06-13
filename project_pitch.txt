@@ -1,0 +1,2 @@
+En simpel webapplikation til en anime-butik/markedsplads bygget med ASP.NET Core Blazor og PostgreSQL, hvor brugere kan købe og sælge anime-merchandise (samlekort og t-shirts).
+Platformen giver brugerne mulighed for at oprette salgsannoncer og handle sikkert med andre via en brugervenlig grænseflade. Med opdateringer i realtid og fokus på animekultur skaber den en engagerende markedsplads for både samlere og fans.
