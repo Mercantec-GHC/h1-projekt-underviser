@@ -1,6 +1,5 @@
 @page "/"
 @inject IJSRuntime JsRuntime
-@inject IConfiguration Configuration
 @rendermode InteractiveServer
 @using System.ComponentModel.DataAnnotations;
 @inject ContactService ContactService
@@ -421,7 +420,7 @@
     
     // ==================== ФУНКЦИИ ====================
 // Создаем запасной профиль когда что-то пошло не так
-    private UserProfile CreateFallbackProfile(string reason, Exception? ex = null)
+    private UserProfile CreateFallbackProfile(Exception? ex = null)
     {
         if (ex != null)
         {
@@ -460,12 +459,12 @@ private async Task LoadUserProfileAsync()
     {
         _profiles = await UserProfileService.LoadProfilesAsync();
         _currentUserProfile = _profiles.FirstOrDefault(p => p.Id == _currentUserId) 
-                              ?? CreateFallbackProfile("User not found");
+                              ?? CreateFallbackProfile();
     }
     catch (Exception ex)
     {
         Console.WriteLine($" Something goes wrong : {ex.Message}");
-        _currentUserProfile = CreateFallbackProfile("Error loading profile", ex);
+        _currentUserProfile = CreateFallbackProfile(ex);
     }
 }
     
