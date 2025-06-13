@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
 using OnimeBestofrieeeendo.Models;
 
@@ -11,29 +5,28 @@ namespace OnimeBestofrieeeendo.Components.Services
 {
     public class UserProfileService
     {
-        private readonly IConfiguration _configuration;
+        private readonly string _connString;
 
         public UserProfileService(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _connString = configuration.GetConnectionString("DefaultConnection") ?? "";
         }
 
         public async Task<List<UserProfile>> LoadProfilesAsync()
         {
             var profiles = new List<UserProfile>();
-            var connString = _configuration.GetConnectionString("DefaultConnection");
-            
+
             try
             {
-                await using var conn = new NpgsqlConnection(connString);
+                await using var conn = new NpgsqlConnection(_connString);
                 await conn.OpenAsync();
-                
+
                 var cmd = new NpgsqlCommand(@"
                     SELECT u.id, u.username, u.email, u.join_date, u.balance, u.role,
                            p.avatar_url, p.level, p.bio
                     FROM users u
                     JOIN profiles p ON u.id = p.user_id", conn);
-                
+
                 await using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
@@ -53,32 +46,25 @@ namespace OnimeBestofrieeeendo.Components.Services
             }
             catch (Exception)
             {
-                // Возвращаем пустой список если что-то пошло не так
+                // Лог ошибок можно добавить позже
             }
-            
+
             return profiles;
         }
 
-
         public string GetAvatarUrl(UserProfile profile)
         {
-            if (string.IsNullOrWhiteSpace(profile.AvatarUrl))
-            {
+            var avatar = profile.AvatarUrl;
+            if (string.IsNullOrWhiteSpace(avatar))
                 return "/images/default-avatar.jpg";
-            }
 
-            // Если это URL (начинается с http/https) - возвращаем как есть
-            if (profile.AvatarUrl.StartsWith("http://") || profile.AvatarUrl.StartsWith("https://"))
-            {
-                return profile.AvatarUrl;
-            }
+            if (avatar.StartsWith("http://") || avatar.StartsWith("https://"))
+                return avatar;
 
-            // Если это локальный путь - проверяем существование файла
-            var avatarPath = profile.AvatarUrl.StartsWith("/") ? profile.AvatarUrl : "/" + profile.AvatarUrl;
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", avatarPath.TrimStart('/'));
-            return File.Exists(fullPath) ? avatarPath : "/images/default-avatar.jpg";
+            var path = avatar.StartsWith("/") ? avatar : "/" + avatar;
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", path.TrimStart('/'));
+
+            return File.Exists(fullPath) ? path : "/images/default-avatar.jpg";
         }
-
-
     }
 }
