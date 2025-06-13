@@ -4,16 +4,11 @@ using OnimeBestofrieeeendo.Models;
 namespace OnimeBestofrieeeendo.Components.Services;
 
 
-public class ContactService
+public class ContactService(IConfiguration configuration)
 {
-    private readonly string _connectionString;
-    
-    public ContactService(IConfiguration configuration)
-    {
-        _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
-    }
+    private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
 
-        public async Task SaveContactAsync(ContactFormModel contact)
+    public async Task SaveContactAsync(ContactFormModel contact)
         {
             await using var conn = new NpgsqlConnection(_connectionString);
             await conn.OpenAsync();
