@@ -14,13 +14,13 @@ Styles: Custom CSS med animationer
 Language: C#
 
 📁 Project Structure
-´´´OnimeBestofrieeeendo/
+```OnimeBestofrieeeendo/
 ├── Components/ # Reusable UI components
 │ ├── Pages/ # Web pages (Home, Shop, etc.)
 │ ├── Services/ # Business logic
 │ └── Layout/ # Page layouts
 ├── Models/ # Data models
-└── wwwroot/ # Static files (CSS, images, JS)´´´
+└── wwwroot/ # Static files (CSS, images, JS)```
 
 🚀 Sådan kører du det
 Krav:
