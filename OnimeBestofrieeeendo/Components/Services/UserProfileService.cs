@@ -39,9 +39,10 @@ namespace OnimeBestofrieeeendo.Components.Services
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Лог ошибок можно добавить позже
+                // Simple error logging - ErrorHandler handles the UI part
+                ErrorHandler.LogError(ex, "UserProfileService.LoadProfilesAsync");
             }
 
             return profiles;

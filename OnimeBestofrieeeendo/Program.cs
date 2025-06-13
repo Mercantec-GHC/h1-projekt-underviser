@@ -19,6 +19,7 @@ public class Program
         builder.Services.AddScoped<DbService>();
         builder.Services.AddScoped<ShopService>();
         builder.Services.AddScoped<ShopBusinessService>();
+        builder.Services.AddScoped<ErrorHandler>();
 
         var app = builder.Build();
 

@@ -1,18 +1,18 @@
 @page "/"
-@inject IJSRuntime JsRuntime
 @rendermode InteractiveServer
-@using System.ComponentModel.DataAnnotations;
+
+@* These inject services - like getting helpers from outside to do specific jobs *@
 @inject ContactService ContactService
-@inject UserProfileService UserProfileService
+@inject UserProfileService UserProfileService  
 @inject ShopService ShopService
 @inject ShopBusinessService ShopBusinessService
-@using OnimeBestofrieeeendo.Models
+@inject ErrorHandler ErrorHandler
 
 
-<!-- ==================== ГЛАВНАЯ СЕКЦИЯ ==================== -->
+@* ==================== HOMEPAGE SECTIONS ==================== *@
 
-<!-- ===== MAIN SECTION ===== -->
-<!-- This is the main hero section with logo and slogan -->
+@* ===== TOP SECTION WITH LOGO ===== *@
+@* This is where we show our cool logo and main message *@
 <section id="home" class="section">
     <div class="container">
         <FloatingParticles />
@@ -306,10 +306,13 @@
 
 
 @code {
-    // ===== PROFILE STUFF =====
+    // ==================== C# CODE SECTION ====================
+    // This is where all the logic happens - like a brain of the page!
+    
+    // ===== PROFILE STUFF =====  
     // Here we keep info about users and load their profiles
     private List<UserProfile> _profiles = new();
-    private readonly int _currentUserId = 1; // just using 1 for now
+    private readonly int _currentUserId = 1; // just using 1 for now - like a demo user
     private UserProfile? _currentUserProfile;
 
     // Loads all page data (profile and products)
@@ -332,7 +335,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($" Something goes wrong : {ex.Message}");
+            await ErrorHandler.HandleDatabaseErrorAsync(ex, "Loading user profile");
             _currentUserProfile = CreateFallbackProfile();
         }
     }
@@ -340,7 +343,15 @@
     // Loads products from shop
     private async Task LoadProductsAsync()
     {
-        _shopProducts = await ShopService.LoadProductsAsync();
+        try
+        {
+            _shopProducts = await ShopService.LoadProductsAsync();
+        }
+        catch (Exception ex)
+        {
+            await ErrorHandler.HandleServiceErrorAsync(ex, "Shop Service");
+            _shopProducts = new List<ShopProductView>(); // Empty list as fallback
+        }
     }
 
     // Makes a fake profile if something is broken
@@ -416,7 +427,7 @@
 
         if (!CanBuyProduct(product))
         {
-            await ShowPopup("Oops! Not enough money 🤷‍♂️", "Go sell your soul or start hustling, buddy!");
+            await ErrorHandler.ShowUserErrorAsync("Not enough money! Go sell your soul or start hustling, buddy!");
             return;
         }
 
@@ -424,14 +435,14 @@
 
         if (success)
         {
-            await ShowPopup("Congrats 🎉", $"You bought: {product.Name}!");
+            await ErrorHandler.ShowSuccessAsync($"You bought: {product.Name}!");
             _shopProducts = await ShopService.LoadProductsAsync();
             _currentUserProfile.Balance -= product.Price;
             StateHasChanged();
         }
         else
         {
-            await ShowPopup("Error😵", "Something went wrong while buying the product. Please try again later.");
+            await ErrorHandler.ShowUserErrorAsync("Something went wrong while buying the product. Please try again later.");
         }
     }
 
@@ -445,14 +456,13 @@
         try
         {
             await ContactService.SaveContactAsync(_contactForm);
-            await ShowPopup("Thank you!", "Your message has been sent. We will contact you soon, but remember — my STAND is \"The World\".");
+            await ErrorHandler.ShowSuccessAsync("Your message has been sent. We will contact you soon!");
             ResetContactForm();
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            await ShowPopup("Error", "Something went wrong. Please try again later.");
-            Console.WriteLine(ex.Message);
+            await ErrorHandler.HandleServiceErrorAsync(ex, "Contact Service");
         }
     }
 
@@ -462,14 +472,6 @@
         _contactForm = new ContactFormModel();
     }
 
-    // ===== HELPERS =====
-    // Just a helper to show popups
-    private async Task ShowPopup(string title, string message)
-    {
-        await JsRuntime.InvokeVoidAsync("showFunnyPopup", title, message);
-    }
-
-    // ===== PAGE INIT =====
     // Loads everything when page starts
     protected override async Task OnInitializedAsync()
     {

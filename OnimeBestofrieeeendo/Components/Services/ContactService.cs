@@ -9,6 +9,8 @@ public class ContactService(IConfiguration configuration)
     private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
 
     public async Task SaveContactAsync(ContactFormModel contact)
+    {
+        try
         {
             await using var conn = new NpgsqlConnection(_connectionString);
             await conn.OpenAsync();
@@ -21,5 +23,12 @@ public class ContactService(IConfiguration configuration)
 
             await cmd.ExecuteNonQueryAsync();
         }
+        catch (Exception ex)
+        {
+            // Log error for developers to see
+            ErrorHandler.LogError(ex, "ContactService.SaveContactAsync");
+            throw; // Re-throw so the calling component can handle UI feedback
+        }
+    }
     
 }
